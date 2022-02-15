@@ -128,6 +128,8 @@ def get_git_rev():
         git_rev = repo.active_branch.commit.name_rev
     except TypeError:
         git_rev = repo.head.object.name_rev
+    except git.exc.InvalidGitRepositoryError:
+        return None
 
     return git_rev
 
