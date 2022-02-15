@@ -20,6 +20,7 @@ from examples.instrument import run_example_local
 
 import mbpo.static
 
+
 class ExperimentRunner(tune.Trainable):
     def _setup(self, variant):
         set_seed(variant['run_params']['seed'])
@@ -63,7 +64,7 @@ class ExperimentRunner(tune.Trainable):
         domain = environment_params['training']['domain']
         static_fns = mbpo.static[domain.lower()]
         ####
- 
+
         self.algorithm = get_algorithm_from_variant(
             variant=self._variant,
             training_environment=training_environment,
@@ -205,8 +206,9 @@ class ExperimentRunner(tune.Trainable):
         self.algorithm.__setstate__(picklable['algorithm'].__getstate__())
 
         tf_checkpoint = self._get_tf_checkpoint()
-        status = tf_checkpoint.restore(tf.train.latest_checkpoint(
-            os.path.split(self._tf_checkpoint_prefix(checkpoint_dir))[0]))
+        status = tf_checkpoint.restore(
+            os.path.join(checkpoint_dir,
+                         os.path.basename(tf.train.get_checkpoint_state(checkpoint_dir).model_checkpoint_path)))
 
         status.assert_consumed().run_restore_ops(self._session)
         initialize_tf_variables(self._session, only_uninitialized=True)
